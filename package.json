@@ -1,0 +1,23 @@
+{
+  "name": "thinkingbot-discord",
+  "version": "1.0.0",
+  "description": "APIを使ってDiscordに送信しよう。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mf-3d/thinkingBot-Discord.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mf-3d/thinkingBot-Discord/issues"
+  },
+  "homepage": "https://github.com/Mf-3d/thinkingBot-Discord#readme",
+  "dependencies": {
+    "discord.js": "^14.5.0"
+  }
+}
