@@ -1,8 +1,14 @@
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds], partials: [Partials.Channel] });
-const request = require("request");
-const Database = require("@replit/database")
 
+const request = require("request");
+const Database = require("@replit/database");
+const express = require("express");
+
+const client = new Client({
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages],
+  partials: [Partials.Channel]
+});
+const app = express();
 const db = new Database();
 
 const rqt = (url) => {
@@ -13,7 +19,8 @@ const rqt = (url) => {
   });
 }
 
-client.once("ready", async () => {
+
+client.on("ready", async () => {
   console.log('Ready!');
 
   const data = [
@@ -48,11 +55,13 @@ client.once("ready", async () => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  // if (message.channel.id === db.get(`settings.${message.guild.id}.channel.talk`)) {
-  //   const result = JSON.parse(await rqt("https://thinkingbot-api.mf7cli.repl.co/api/v1/generate/random"));
+  if (message.channel.id === await db.get(`settings.${message.guild.id}.channel.talk`)) {
+    message.channel.sendTyping();
     
-  //   message.channel.send(result.result.result);
-  // }
+    const result = JSON.parse(await rqt("https://thinkingbot-api.mf7cli.repl.co/api/v1/generate/random"));
+    
+    message.channel.send(result.result.result);
+  }
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -75,7 +84,7 @@ client.on("interactionCreate", async (interaction) => {
       const channel = interaction.options.getChannel(interaction.options.data[0].name);
       
       if (channel.type !== 0) {
-        interaction.reply(`テキストチャンネルを指定してください。\n${channel.type}`);
+        interaction.reply(`テキストチャンネルを指定してください。`);
         return;
       }
 
@@ -87,3 +96,8 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
+app.get("/", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.send("thinkingのBot#0076");
+});
