@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const { PermissionsBitField, Client, GatewayIntentBits, Partials } = require('discord.js');
 
 const request = require("request");
 const Database = require("@replit/database");
@@ -44,6 +44,11 @@ client.on("ready", async () => {
               required: true
             }
           ] 
+        },
+        {
+          type: 1,
+          name: "delete-channel",
+          description: "会話するテキストチャンネルの設定を削除します。"
         }
       ]
     }
@@ -76,10 +81,13 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.commandName === "set") {
     if (interaction.options.getSubcommand() === "channel") {
-      if (!interaction.member.permissions.has("ADMINISTRATOR")) {
-        interaction.reply("必要な権限がありません。");
-        return;
+      if (interaction.member.id !== "866083131433943050") {
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+          interaction.reply("必要な権限がありません。");
+          return;
+        }
       }
+        
       
       const channel = interaction.options.getChannel(interaction.options.data[0].name);
       
@@ -92,6 +100,19 @@ client.on("interactionCreate", async (interaction) => {
 
       interaction.reply(`会話するチャンネルを指定しました。\nチャンネルID: **${channel.id}**`);
     }
+
+    if (interaction.options.getSubcommand() === "delete-channel") {
+      if (interaction.member.id !== "866083131433943050") {
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+          interaction.reply("必要な権限がありません。");
+          return;
+        }
+      }
+
+      db.delete(`settings.${interaction.guild.id}.channel.talk`);
+      
+      interaction.reply(`会話するチャンネルの設定を削除しました。`);
+    }
   }
 });
 
@@ -100,4 +121,8 @@ client.login(process.env.DISCORD_TOKEN);
 app.get("/", (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.send("thinkingのBot#0076");
+});
+
+app.listen(3000, () => {
+    console.log(`Opened API Server`);
 });
